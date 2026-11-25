@@ -20,6 +20,12 @@ const META = {
 };
 const H1 = {de:['Mexikanisches Restaurant in Düsseldorf:','echtes','Fiesta-Feeling.'], en:['Mexican restaurant in Düsseldorf:','real','fiesta feeling.']};
 const GBP = {de:['Auf Google bewerten','Route planen'], en:['Review us on Google','Get directions']};
+const MAP = {
+ de:{text:'Mit dem Laden der Karte stimmen Sie der Datenübertragung an Google zu.',btn:'Karte laden',open:'In Google Maps öffnen'},
+ en:{text:'By loading the map you agree to data being sent to Google.',btn:'Load map',open:'Open in Google Maps'}
+};
+const MAP_SRC = 'https://www.google.com/maps?q=Adersstra%C3%9Fe%2046%2C%2040215%20D%C3%BCsseldorf&z=16&output=embed';
+const MAP_TITLE = 'Pssst Bandido Düsseldorf – Adersstraße 46, 40215 Düsseldorf auf Google Maps';
 
 function setMeta(sel, attr, val){ const el=document.querySelector(sel); if(el) el.setAttribute(attr,val); }
 function update(){
@@ -37,7 +43,22 @@ function update(){
   const g1=document.getElementById('gbp-reviews-text'), g2=document.getElementById('gbp-route-text');
   if(g1) g1.textContent=GBP[lang][0];
   if(g2) g2.textContent=GBP[lang][1];
+  const mt=document.getElementById('map-consent-text'), mb=document.getElementById('map-load'), mo=document.getElementById('map-open');
+  if(mt) mt.textContent=MAP[lang].text;
+  if(mb) mb.textContent=MAP[lang].btn;
+  if(mo) mo.textContent=MAP[lang].open;
 }
+/* Load the Google map only after the visitor clicks (DSGVO / privacy) */
+function loadMap(){
+  const box=document.getElementById('map');
+  if(!box || box.querySelector('iframe')) return;
+  const f=document.createElement('iframe');
+  f.id='map-frame'; f.title=MAP_TITLE; f.src=MAP_SRC; f.loading='lazy'; f.allowFullscreen=true;
+  f.referrerPolicy='no-referrer-when-downgrade';
+  box.innerHTML=''; box.appendChild(f); box.classList.add('loaded');
+}
+const mapBtn=document.getElementById('map-load');
+if(mapBtn) mapBtn.addEventListener('click', loadMap);
 addEventListener('hashchange', update);
 document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => setTimeout(update,0)));
 update();
